@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="e2a0fc5f-aa0b-40e8-aabd-f02476626453" name="LPC">
+        <fileTransfer rootFolder="/home/morales" accessType="SFTP" host="localhost" port="2222" sshConfigId="ab44656a-f345-40a9-879f-197467d1bfba" sshConfig="morales@localhost:2222 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
