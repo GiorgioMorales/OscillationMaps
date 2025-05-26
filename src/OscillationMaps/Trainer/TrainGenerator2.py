@@ -133,7 +133,7 @@ class TrainModel:
                 # Load batches as chunks
                 batch = [self.dataset[idx] for idx in batch_indices]
                 p_t_nu_batch = torch.stack([b[0][:self.crop, :self.crop, :, :] for b in batch])  # (batch_size, 120, 120, 3, 3)
-                p_t_nu_vacuum_batch = torch.stack([b[1][:self.crop, :self.crop, :, :] for b in batch]) # (batch_size, 120, 120, 3, 3)
+                p_t_nu_vacuum_batch = torch.stack([b[1][:self.crop, :self.crop, :, :] for b in batch])  # (batch_size, 120, 120, 3, 3)
                 b, h, w, ch, d = p_t_nu_batch.shape
                 p_t_nu_batch = p_t_nu_batch.permute(0, 3, 4, 1, 2).view(b, ch * d, h, w).to(self.device)
                 p_t_nu_vacuum_batch = p_t_nu_vacuum_batch.permute(0, 3, 4, 1, 2).view(b, ch * d, h, w).to(self.device)

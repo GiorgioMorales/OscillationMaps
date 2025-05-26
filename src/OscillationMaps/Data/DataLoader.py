@@ -21,7 +21,6 @@ class HDF5Dataset(Dataset):
             with h5py.File(self.h5_file_path, "r") as f:
                 self.dataset_size = f["p_t_nu"].shape[0]
 
-
     def __len__(self):
         return self.dataset_size
 

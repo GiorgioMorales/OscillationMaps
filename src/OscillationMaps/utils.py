@@ -19,7 +19,7 @@ def plot_osc_maps(input_image, title=None):
     for i in range(3):
         for j in range(3):
             ax = axes[i, j]
-            im = ax.imshow(input_image[:, :, i, j], cmap="viridis", aspect="auto")
+            im = ax.imshow(input_image[:, :, i, j], cmap="viridis", aspect="auto", vmin=0, vmax=1)
             ax.set_title(titles[i][j], fontsize=14)
             ax.axis("off")
             fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
