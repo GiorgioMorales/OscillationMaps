@@ -108,29 +108,44 @@ class MLP3(nn.Module, ABC):
 
 
 class MLP4(nn.Module, ABC):
-    """Defines conventional NN architecture"""
+    """Defines conventional NN architecture with dropout"""
 
-    def __init__(self, input_features: int = 10, output_size: int = 1):
+    def __init__(self, input_features: int = 10, output_size: int = 1, dropout_prob: float = 0.3):
         """
         Initialize NN
         :param input_features: Input shape of the network.
         :param output_size: Output shape of the network.
+        :param dropout_prob: Probability of dropping units during training.
         """
         super(MLP4, self).__init__()
         self.hidden_layer1 = nn.Sequential(
-            nn.Linear(in_features=input_features, out_features=200), nn.ReLU())
+            nn.Linear(in_features=input_features, out_features=200),
+            nn.ReLU()
+        )
         self.hidden_layer2 = nn.Sequential(
-            nn.Linear(in_features=200, out_features=500), nn.ReLU())
+            nn.Linear(in_features=200, out_features=500),
+            nn.ReLU(),
+            nn.Dropout(p=dropout_prob)
+        )
         self.hidden_layer3 = nn.Sequential(
-            nn.Linear(in_features=500, out_features=500), nn.ReLU())
+            nn.Linear(in_features=500, out_features=500),
+            nn.ReLU(),
+            nn.Dropout(p=dropout_prob)
+        )
         self.hidden_layer4 = nn.Sequential(
-            nn.Linear(in_features=500, out_features=500), nn.ReLU())
+            nn.Linear(in_features=500, out_features=500),
+            nn.ReLU(),
+            nn.Dropout(p=dropout_prob)
+        )
         self.hidden_layer5 = nn.Sequential(
-            nn.Linear(in_features=500, out_features=100), nn.ReLU())
+            nn.Linear(in_features=500, out_features=100),
+            nn.ReLU()
+        )
         self.hidden_layer6 = nn.Sequential(
-            nn.Linear(in_features=100, out_features=50), nn.ReLU())
+            nn.Linear(in_features=100, out_features=50),
+            nn.ReLU()
+        )
 
-        # Number of outputs depends on the method
         self.out = nn.Linear(50, output_size)
 
     def forward(self, x):

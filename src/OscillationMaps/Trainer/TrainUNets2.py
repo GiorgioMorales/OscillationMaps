@@ -171,12 +171,15 @@ class TrainModel:
         selected_channels = [(0, 0), (1, 1), (2, 2), (0, 1)]
         for batch_indices in batches:
             batch = [self.dataset[idx] for idx in batch_indices]
+            p_t_nu_batch = torch.stack([b[0][:self.crop, :self.crop, :, :] for b in batch])
             p_t_nu_vacuum_batch = torch.stack([b[1][:self.crop, :self.crop, :, :] for b in batch])
             osc_par_batch = torch.stack([b[3][[0, 1, 2, 5]] for b in batch])
 
             ch_i, ch_j = selected_channels[model_i]
             B, H, W = p_t_nu_vacuum_batch.shape[:3]
             input_vacuum = p_t_nu_vacuum_batch[:, :, :, ch_i, ch_j].reshape(-1, 1)
+            target_image = p_t_nu_batch[:, :, :, ch_i, ch_j]
+            target_vector = target_image.reshape(-1)
 
             # Repeat position and osc params
             x_coords = torch.arange(H).view(-1, 1).repeat(1, W).flatten()
