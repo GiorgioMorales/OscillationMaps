@@ -1,0 +1,17 @@
+/src/OscillationMaps/Models/model.py
+/src/OscillationMaps/Models/model2.py
+/src/OscillationMaps/Models/network.py
+/src/OscillationMaps/Models/network2.py
+/src/OscillationMaps/Models/nn.py
+/src/OscillationMaps/Models/unet.py
+/src/OscillationMaps/Models/unet_osc.py
+/src/OscillationMaps/PRCurves/
+/src/OscillationMaps/Trainer/EvaluateFNN.py
+/src/OscillationMaps/Trainer/loss.py
+/src/OscillationMaps/Trainer/TrainAllFNN.py
+/src/OscillationMaps/Trainer/TrainGenerator.py
+/src/OscillationMaps/Trainer/TrainGenerator2.py
+/src/OscillationMaps/Trainer/TrainUNets2.py
+/src/OscillationMaps/Trainer/TrainUNets.py
+Analysis.py
+Main.py
