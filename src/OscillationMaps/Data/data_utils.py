@@ -6,6 +6,7 @@ from tqdm import trange
 
 def load_h5_data(h5_file_path):
     data_dict = {}
+
     def recursive_read(h5_obj, prefix=""):
         for key in h5_obj.keys():
             full_key = f"{prefix}/{key}" if prefix else key

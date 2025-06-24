@@ -1,3 +1,6 @@
+import torch
+import pynvml
+import itertools
 import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -29,3 +32,35 @@ def plot_osc_maps(input_image, title=None):
         fig.suptitle(title)
     plt.tight_layout()
     plt.show()
+
+
+def get_available_gpus():
+    return [torch.device(f"cuda:{i}") for i in range(torch.cuda.device_count())]
+
+
+def get_least_used_gpus(n=4):
+    pynvml.nvmlInit()
+    device_count = pynvml.nvmlDeviceGetCount()
+    gpu_free_mem = []
+
+    for i in range(device_count):
+        handle = pynvml.nvmlDeviceGetHandleByIndex(i)
+        mem_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
+        gpu_free_mem.append((i, mem_info.free))
+    # Sort GPUs by most free memory
+    sorted_gpus = sorted(gpu_free_mem, key=lambda x: x[1], reverse=True)
+    selected_gpu_ids = [gpu_id for gpu_id, _ in sorted_gpus]
+    # Repeat GPUs if fewer than n are available
+    repeated_gpu_ids = list(itertools.islice(itertools.cycle(selected_gpu_ids), n))
+    pynvml.nvmlShutdown()
+    return [torch.device(f"cuda:{gpu_id}") for gpu_id in repeated_gpu_ids]
+
+
+def sinkhorn_normalization(R, num_iters=10, eps=1e-8):
+    # R = np.exp(R)
+    for _ in range(num_iters):
+        # Normalize rows
+        R /= R.sum(axis=-1, keepdims=True) + eps
+        # Normalize columns
+        R /= R.sum(axis=-2, keepdims=True) + eps
+    return R

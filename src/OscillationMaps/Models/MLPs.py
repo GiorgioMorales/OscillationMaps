@@ -110,12 +110,21 @@ class MLP3(nn.Module, ABC):
 class MLP4(nn.Module, ABC):
     """Defines conventional NN architecture with dropout"""
 
-    def __init__(self, input_features: int = 10, output_size: int = 1, dropout_prob: float = 0.3):
+    class SineLayer(nn.Module):
+        def __init__(self, in_features, out_features):
+            super().__init__()
+            self.linear = nn.Linear(in_features, out_features)
+
+        def forward(self, x):
+            return torch.sin(self.linear(x))
+
+    def __init__(self, input_features: int = 10, output_size: int = 1, dropout_prob: float = 0, sin: bool = False):
         """
         Initialize NN
         :param input_features: Input shape of the network.
         :param output_size: Output shape of the network.
         :param dropout_prob: Probability of dropping units during training.
+        :param sin: If True, Use Sinusoidal activation function
         """
         super(MLP4, self).__init__()
         self.hidden_layer1 = nn.Sequential(
@@ -146,6 +155,64 @@ class MLP4(nn.Module, ABC):
             nn.ReLU()
         )
 
+        if sin:
+            self.out = self.SineLayer(50, output_size)
+        else:
+            self.out = nn.Linear(50, output_size)
+
+    def forward(self, x):
+        x = self.hidden_layer1(x)
+        x = self.hidden_layer2(x)
+        x = self.hidden_layer3(x)
+        x = self.hidden_layer4(x)
+        x = self.hidden_layer5(x)
+        x = self.hidden_layer6(x)
+        return self.out(x)
+
+
+class MLP5(nn.Module, ABC):
+    """Defines conventional NN architecture with dropout"""
+
+    def __init__(self, input_features: int = 10, output_size: int = 1, dropout_prob: float = 0.3):
+        """
+        Initialize NN
+        :param input_features: Input shape of the network.
+        :param output_size: Output shape of the network.
+        :param dropout_prob: Probability of dropping units during training.
+        """
+        super(MLP5, self).__init__()
+        self.hidden_layer1 = nn.Sequential(
+            nn.Linear(in_features=input_features, out_features=200),
+            nn.ReLU()
+        )
+        self.hidden_layer2 = nn.Sequential(
+            nn.Linear(in_features=200, out_features=500),
+            nn.ReLU(),
+            nn.Dropout(p=dropout_prob)
+        )
+        self.hidden_layer3 = nn.Sequential(
+            nn.Linear(in_features=500, out_features=500),
+            nn.ReLU(),
+            nn.Dropout(p=dropout_prob)
+        )
+        self.hidden_layer4 = nn.Sequential(
+            nn.Linear(in_features=500, out_features=500),
+            nn.ReLU(),
+            nn.Dropout(p=dropout_prob)
+        )
+        self.hidden_layer5 = nn.Sequential(
+            nn.Linear(in_features=500, out_features=500),
+            nn.ReLU()
+        )
+        self.hidden_layer6 = nn.Sequential(
+            nn.Linear(in_features=500, out_features=100),
+            nn.ReLU()
+        )
+        self.hidden_layer7 = nn.Sequential(
+            nn.Linear(in_features=100, out_features=50),
+            nn.ReLU()
+        )
+
         self.out = nn.Linear(50, output_size)
 
     def forward(self, x):
@@ -155,4 +222,5 @@ class MLP4(nn.Module, ABC):
         x = self.hidden_layer4(x)
         x = self.hidden_layer5(x)
         x = self.hidden_layer6(x)
+        x = self.hidden_layer7(x)
         return self.out(x)

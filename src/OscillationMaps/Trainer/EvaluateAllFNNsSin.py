@@ -10,7 +10,7 @@ class EvalModel:
         self.crop = 120
         self.model_is = [0, 1, 2, 3, 4, 5, 6, 7, 8]
         self.n_models = len(self.model_is)
-        self.simpler_models = [1, 6, 8]
+        self.simpler_models = [6]
         self.dataset = HDF5Dataset(datapath)
         self.devices = get_least_used_gpus(n=4)
         self.models = self.reset_model()
@@ -27,7 +27,7 @@ class EvalModel:
         models = []
         for i in self.model_is:
             if i in self.simpler_models:
-                models.append(MLP3(input_features=9))
+                models.append(MLP4(input_features=8, sin=True))
             else:
                 models.append(MLP4(input_features=9))
         return models
@@ -43,7 +43,7 @@ class EvalModel:
         batch_size = 1
         for im, mdl in enumerate(self.model_is):
             if mdl in self.simpler_models:
-                f = filepath + 'MLP3'
+                f = filepath + 'MLP4'
             else:
                 f = filepath + 'MLP4'
             f = f + "//Model-" + "-Instance" + str(instance) + '.pth'
@@ -66,11 +66,11 @@ class EvalModel:
                 p_t_nu_vacuum_batch = torch.stack([b[1][:self.crop, :self.crop, :, :] for b in batch])
                 osc_par_batch = torch.stack([b[3][[0, 1, 2, 3, 4, 5]] for b in batch])
 
-                osc_pred_batch = p_t_nu_vacuum_batch[0, :, :, :, :].cpu().numpy() * 0
+                osc_pred_batch = p_t_nu_batch[0, :, :, :, :].cpu().numpy() * 0
                 for im, mdl in enumerate(self.model_is):
                     device = self.devices[im]
                     ch_i, ch_j = selected_channels[mdl]
-                    H, W = p_t_nu_vacuum_batch.shape[1:3]
+                    H, W = p_t_nu_batch.shape[1:3]
 
                     input_vacuum = p_t_nu_vacuum_batch[0, :, :, ch_i, ch_j].reshape(-1, 1)
                     target_image = p_t_nu_batch[0, :, :, ch_i, ch_j]
@@ -84,7 +84,10 @@ class EvalModel:
                     pos_grid = pos_grid.expand(H * W, 2)
                     osc_rep = osc_par_batch.repeat(H * W, 1)
 
-                    input_vector = torch.cat([pos_grid, osc_rep, input_vacuum], dim=1).to(device)
+                    if mdl in self.simpler_models:
+                        input_vector = torch.cat([pos_grid, osc_rep], dim=1).to(device)
+                    else:
+                        input_vector = torch.cat([pos_grid, osc_rep, input_vacuum], dim=1).to(device)
                     input_vector = (input_vector - self.dataset_mean[im]) / self.dataset_std[im]
 
                     output_i = self.models[im](input_vector)
@@ -105,7 +108,7 @@ class EvalModel:
 
                 plot_osc_maps(p_t_nu_batch[0, :, :, :, :], title='Real Osc. Maps w/ Matter effect')
                 plot_osc_maps(osc_pred_batch, title='Pred. Osc. Maps w/ Matter effect')
-                plot_osc_maps(p_t_nu_vacuum_batch[0, :, :, :, :], title='Osc. Maps in Vacuum')
+                # plot_osc_maps(p_t_nu_vacuum_batch[0, :, :, :, :], title='Osc. Maps in Vacuum')
 
             val_loss_avg = [vl / len(val_batches) for vl in val_loss_global]
             print(f'val_loss: {[round(l / len(val_batches), 4) for l in val_loss_avg]}')
@@ -115,7 +118,7 @@ class EvalModel:
             print(f"Model {i} assigned to {dev} - {torch.cuda.get_device_name(dev)}")
         # If the folder does not exist, create it
         root = get_project_root()
-        folder = os.path.join(root, "Models//saved_models//ModelType-")
+        folder = os.path.join(root, "Models//saved_models//ModelType-Sin-")
 
         for mi in range(ensemble_size):
             self.models = self.reset_model()
