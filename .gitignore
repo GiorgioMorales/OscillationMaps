@@ -15,3 +15,4 @@
 /src/OscillationMaps/Trainer/TrainUNets.py
 Analysis.py
 Main.py
+/src/OscillationMaps/EvaluateModel.py
