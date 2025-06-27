@@ -25,7 +25,7 @@ class MatterEffect:
 
         # Load models
         root = get_project_root()
-        folder = os.path.join(root, "Models//saved_models//MLPS")
+        folder = os.path.join(root, "Models//saved_models")
         for im, mdl in enumerate(self.model_is):
             f = folder + "//Model--Instance0.pth"
             self.models[im].to(self.device)

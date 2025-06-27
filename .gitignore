@@ -16,3 +16,6 @@
 Analysis.py
 Main.py
 /src/OscillationMaps/EvaluateModel.py
+/src/OscillationMaps/Models/saved_models/ModelType-2
+/src/OscillationMaps/Models/saved_models/ModelType-MLP3
+/src/OscillationMaps/Models/saved_models/ModelType-MLP4
