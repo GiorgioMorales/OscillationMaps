@@ -18,6 +18,6 @@ setuptools.setup(
     # packages=setuptools.find_namespace_packages(where="src"),
     package_dir={"": "src"},
     include_package_data=True,
-    install_requires=['matplotlib==3.9', 'numpy', 'opencv-python', 'tqdm', 'h5py', 'pyodbc', 'regex',
+    install_requires=['matplotlib', 'numpy', 'opencv-python', 'tqdm', 'h5py', 'pyodbc', 'regex',
                       'torchsummary', 'python-dotenv', 'omegaconf', 'pandas', 'pynvml'],
 )
