@@ -77,11 +77,12 @@ class MLP2(nn.Module, ABC):
 class MLP3(nn.Module, ABC):
     """Defines conventional NN architecture"""
 
-    def __init__(self, input_features: int = 10, output_size: int = 1):
+    def __init__(self, input_features: int = 10, output_size: int = 1, sin: bool = False):
         """
         Initialize NN
         :param input_features: Input shape of the network.
         :param output_size: Output shape of the network.
+        :param sin: If True, Use Sinusoidal activation function
         """
         super(MLP3, self).__init__()
         self.hidden_layer1 = nn.Sequential(
@@ -95,8 +96,10 @@ class MLP3(nn.Module, ABC):
         self.hidden_layer5 = nn.Sequential(
             nn.Linear(in_features=100, out_features=50), nn.ReLU())
 
-        # Number of outputs depends on the method
-        self.out = nn.Linear(50, output_size)
+        if sin:
+            self.out = self.SineLayer(50, output_size)
+        else:
+            self.out = nn.Linear(50, output_size)
 
     def forward(self, x):
         x = self.hidden_layer1(x)

@@ -1,7 +1,6 @@
 import os
 from OscillationMaps.utils import *
 from OscillationMaps.Models.MLPs import *
-from OscillationMaps.Trainer.loss import *
 from OscillationMaps.Data.DataLoader import HDF5Dataset
 
 
@@ -10,7 +9,7 @@ class EvalModel:
         self.crop = 120
         self.model_is = [0, 1, 2, 3, 4, 5, 6, 7, 8]
         self.n_models = len(self.model_is)
-        self.simpler_models = [6]
+        self.simpler_models = [0, 6, 8]
         self.dataset = HDF5Dataset(datapath)
         self.devices = get_least_used_gpus(n=4)
         self.models = self.reset_model()
@@ -26,10 +25,13 @@ class EvalModel:
     def reset_model(self):
         models = []
         for i in self.model_is:
-            if i in self.simpler_models:
-                models.append(MLP4(input_features=8, sin=True))
+            sin_flag, num_feat = False, 9
+            if i == 1:
+                models.append(MLP3(input_features=num_feat))
             else:
-                models.append(MLP4(input_features=9))
+                if i in self.simpler_models:
+                    sin_flag, num_feat = True, 8
+                models.append(MLP4(input_features=num_feat, sin=sin_flag))
         return models
 
     def eval(self, filepath='', instance=0):
@@ -42,11 +44,7 @@ class EvalModel:
 
         batch_size = 1
         for im, mdl in enumerate(self.model_is):
-            if mdl in self.simpler_models:
-                f = filepath + 'MLP4'
-            else:
-                f = filepath + 'MLP4'
-            f = f + "//Model-" + "-Instance" + str(instance) + '.pth'
+            f = filepath + "//Model-" + "-Instance" + str(instance) + '.pth'
             self.models[im].to(self.devices[im])
             stats = torch.load(f'{f}_NNmodel{mdl}_norm_stats.pt', map_location=self.devices[im])
             self.dataset_mean[im] = stats['mean']
@@ -118,7 +116,7 @@ class EvalModel:
             print(f"Model {i} assigned to {dev} - {torch.cuda.get_device_name(dev)}")
         # If the folder does not exist, create it
         root = get_project_root()
-        folder = os.path.join(root, "Models//saved_models//ModelType-Sin-")
+        folder = os.path.join(root, "Models//saved_models//MLPS")
 
         for mi in range(ensemble_size):
             self.models = self.reset_model()
