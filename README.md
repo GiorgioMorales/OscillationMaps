@@ -1,4 +1,4 @@
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NISL-MSU/PredictionIntervals/blob/master/Demo_OscillAI.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/GiorgioMorales/OscillationMaps/blob/master/Demo_OscillAI.ipynb)
 
 
 # OscillAI: Simulating Neutrino Oscillation Maps using AI
@@ -11,7 +11,7 @@ The following libraries have to be installed:
 
 To install the package, run `pip install -q git+https://github.com/GiorgioMorales/OscillationMaps` in the terminal.
 
-You can also try the package on [Google Colab](https://colab.research.google.com/github/NISL-MSU/PredictionIntervals/blob/master/Demo_OscillAI.ipynb).
+You can also try the package on [Google Colab](https://colab.research.google.com/github/GiorgioMorales/OscillationMaps/blob/master/Demo_OscillAI.ipynb).
 
 
 ## Usage
