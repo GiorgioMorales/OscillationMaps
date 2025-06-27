@@ -56,6 +56,7 @@ Finally, we can also simulate the oscillation maps in vacuum using the function 
 Note that these maps are calculated analytically and, thus, don't need to use any trained model.
 
 ```python
+from OscillationMaps.VacuumMaps import get_oscillation_maps_vacuum
 # Define parameters
 osc_pars_in = [2.392e+02,  2.955e+02,  2.183e+02,  2.128e+02,  6.523e-05, -5.502e-03]
 # Propagate
