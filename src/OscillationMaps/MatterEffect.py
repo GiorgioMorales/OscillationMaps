@@ -1,5 +1,7 @@
 import os
-from OscillationMaps.Models.MLPs import *
+import torch
+import numpy as np
+from OscillationMaps.Models.MLPs import MLP3, MLP4
 from OscillationMaps.utils import get_project_root
 from OscillationMaps.VacuumMaps import get_oscillation_maps_vacuum
 
@@ -74,13 +76,18 @@ class MatterEffect:
                     input_vector = (input_vector - self.dataset_mean[im]) / self.dataset_std[im]
                     output_i = torch.clip(self.models[im](input_vector.float().to(self.device)), 0, 1)
                     osc_pred_batch[n, :, :, ch_i, ch_j] = np.reshape(output_i.cpu().numpy(), (self.crop, self.crop))
-
         return osc_pred_batch
 
 
 if __name__ == '__main__':
     # Define parameters
-    osc_pars_in = np.array([2.392e+02,  2.955e+02,  2.183e+02,  2.128e+02,  6.523e-05, -5.502e-03])
+    osc_pars_in = np.array([[2.392e+02,  2.955e+02,  2.183e+02,  2.128e+02,  6.523e-05, -5.502e-03],
+                           [2.0650e+02,  2.6060e+02,  1.1860e+02,  2.8160e+01,  6.7460e-05, -4.0790e-03],
+                           [1.2760e+02, 1.8440e+02, 5.6400e+01, 3.1870e+02, 6.7620e-05, 9.7840e-03],
+                           [1.6420e+02, 1.1820e+02, 3.1630e+00, 2.2710e+02, 6.7560e-05, -9.8820e-03],
+                           [5.5570e+01, 1.9820e+02, 2.6070e+02, 2.8350e+02, 2.2470e-05, 9.5280e-03],
+                           [1.6100e+02, 2.5260e+02, 2.0360e+02, 4.5740e+01, 8.3220e-05, 8.0640e-03],
+                           [3.0250e+01, 3.1800e+02, 2.8610e+02, 2.0900e+01, 2.0050e-05, 2.5740e-03]])
 
     # Propagate
     propagator = MatterEffect()

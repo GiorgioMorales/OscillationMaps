@@ -3,9 +3,12 @@ import pynvml
 import itertools
 import numpy as np
 from pathlib import Path
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
+try:
+    import matplotlib
+    matplotlib.use('TkAgg')
+    import matplotlib.pyplot as plt
+except ImportError:
+    import matplotlib.pyplot as plt
 
 
 def get_project_root() -> Path:

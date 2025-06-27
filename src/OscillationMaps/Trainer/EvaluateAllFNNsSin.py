@@ -116,7 +116,7 @@ class EvalModel:
             print(f"Model {i} assigned to {dev} - {torch.cuda.get_device_name(dev)}")
         # If the folder does not exist, create it
         root = get_project_root()
-        folder = os.path.join(root, "Models//saved_models//MLPS")
+        folder = os.path.join(root, "Models//saved_models")
 
         for mi in range(ensemble_size):
             self.models = self.reset_model()
