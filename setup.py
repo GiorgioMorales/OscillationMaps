@@ -19,5 +19,5 @@ setuptools.setup(
     package_dir={"": "src"},
     include_package_data=True,
     install_requires=['numpy', 'opencv-python', 'tqdm', 'h5py', 'pyodbc', 'regex',
-                      'torchsummary', 'python-dotenv', 'omegaconf', 'pandas', 'pynvml'],
+                      'torchsummary', 'python-dotenv', 'omegaconf', 'pandas', 'pynvml', 'matplotlib==3.8'],
 )
