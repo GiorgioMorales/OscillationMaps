@@ -11,7 +11,7 @@ class EvalModel:
         self.n_models = len(self.model_is)
         self.simpler_models = [0, 6, 8]
         self.dataset = HDF5Dataset(datapath)
-        self.devices = get_least_used_gpus(n=4)
+        self.devices = get_least_used_gpus(n=1)
         self.models = self.reset_model()
         self.optimizer = [torch.optim.Adam(mdl.parameters(), lr=5e-5) for mdl in self.models]
         self.criterion = nn.MSELoss()
@@ -38,7 +38,7 @@ class EvalModel:
         np.random.seed(7)
         indices = np.arange(len(self.dataset))
         np.random.shuffle(indices)
-        indices_val = indices[int(len(indices) * 0.8):]
+        indices_val = indices[int(len(indices) * 0.8):int(len(indices) * 0.8)+100]
         self.optimizer = [torch.optim.Adam(mdl.parameters(), lr=5e-5) for mdl in self.models]
         self.devices = [torch.device(f'cpu') for _ in self.model_is]
 
@@ -58,7 +58,8 @@ class EvalModel:
             val_num_batches = max(1, len(indices_val) // batch_size)
             val_batches = np.array_split(indices_val, val_num_batches)
 
-            for batch_indices in val_batches:
+            differences = np.zeros((len(val_batches), self.crop, self.crop, 3, 3))
+            for ib, batch_indices in enumerate(val_batches):
                 batch = [self.dataset[idx] for idx in batch_indices]
                 p_t_nu_batch = torch.stack([b[0][:self.crop, :self.crop, :, :] for b in batch])
                 p_t_nu_vacuum_batch = torch.stack([b[1][:self.crop, :self.crop, :, :] for b in batch])
@@ -88,7 +89,7 @@ class EvalModel:
                         input_vector = torch.cat([pos_grid, osc_rep, input_vacuum], dim=1).to(device)
                     input_vector = (input_vector - self.dataset_mean[im]) / self.dataset_std[im]
 
-                    output_i = self.models[im](input_vector)
+                    output_i = torch.clip(self.models[im](input_vector), 0, 1)
                     osc_pred_batch[:, :, ch_i, ch_j] = np.reshape(output_i.cpu().numpy(), (H, W))
                     loss = self.criterion(output_i, target_i)
                     val_loss_global[im] += loss.item()
@@ -104,12 +105,18 @@ class EvalModel:
                 if np.sum(osc_pred_batch[:, :, 2, 1]) == 0:
                     osc_pred_batch[:, :, 2, 1] = 1 - (osc_pred_batch[:, :, 0, 1] + osc_pred_batch[:, :, 1, 1])
 
-                plot_osc_maps(p_t_nu_batch[0, :, :, :, :], title='Real Osc. Maps w/ Matter effect')
-                plot_osc_maps(osc_pred_batch, title='Pred. Osc. Maps w/ Matter effect')
-                # plot_osc_maps(p_t_nu_vacuum_batch[0, :, :, :, :], title='Osc. Maps in Vacuum')
+                if self.plot:
+                    plot_osc_maps(p_t_nu_batch[0, :, :, :, :], title='Real Osc. Maps w/ Matter effect')
+                    plot_osc_maps(osc_pred_batch, title='Pred. Osc. Maps w/ Matter effect')
+                    # plot_osc_maps(p_t_nu_vacuum_batch[0, :, :, :, :], title='Osc. Maps in Vacuum')
+
+                differences[ib, :, :, :, :] = np.square((p_t_nu_batch[0, :, :, :, :] - osc_pred_batch))
 
             val_loss_avg = [vl / len(val_batches) for vl in val_loss_global]
             print(f'val_loss: {[round(l / len(val_batches), 4) for l in val_loss_avg]}')
+
+        # Plot the pixel-distribution of RMSE
+        return np.sqrt(np.mean(differences, axis=0))
 
     def eval_ensemble(self, ensemble_size=1):
         for i, dev in enumerate(self.devices):
@@ -118,12 +125,16 @@ class EvalModel:
         root = get_project_root()
         folder = os.path.join(root, "Models//saved_models")
 
+        RMSE = []
         for mi in range(ensemble_size):
             self.models = self.reset_model()
-            print("\tTraining ", mi + 1, "/", ensemble_size, " model")
-            self.eval(filepath=folder, instance=mi)
+            print("\tValidating ", mi + 1, "/", ensemble_size, " model")
+            RMSE.append(self.eval(filepath=folder, instance=mi))
+        return RMSE
 
 
 if __name__ == '__main__':
-    modell = EvalModel(plotR=True, verbose=True)
-    modell.eval_ensemble(ensemble_size=1)
+    modell = EvalModel(plotR=False, verbose=True)
+    RMSEv = modell.eval_ensemble(ensemble_size=1)
+
+    plot_osc_maps(RMSEv[0], title='RMSE Maps')
