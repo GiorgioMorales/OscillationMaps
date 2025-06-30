@@ -61,11 +61,11 @@ def get_least_used_gpus(n=4):
     return [torch.device(f"cuda:{gpu_id}") for gpu_id in repeated_gpu_ids]
 
 
-def sinkhorn_normalization(R, num_iters=10, eps=1e-8):
+def sinkhorn_normalization(R, num_iters=3, eps=1e-15):
     # R = np.exp(R)
     for _ in range(num_iters):
-        # Normalize rows
-        R /= R.sum(axis=-1, keepdims=True) + eps
         # Normalize columns
-        R /= R.sum(axis=-2, keepdims=True) + eps
+        R /= R.sum(axis=-2, keepdims=True)  # + eps
+        # Normalize rows
+        R /= R.sum(axis=-1, keepdims=True)  # + eps
     return R

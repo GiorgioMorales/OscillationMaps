@@ -2,8 +2,8 @@ import os
 import torch
 import numpy as np
 from OscillationMaps.Models.MLPs import MLP3, MLP4
-from OscillationMaps.utils import get_project_root
 from OscillationMaps.VacuumMaps import get_oscillation_maps_vacuum
+from OscillationMaps.utils import get_project_root, sinkhorn_normalization
 
 
 class MatterEffect:
@@ -76,6 +76,7 @@ class MatterEffect:
                     input_vector = (input_vector - self.dataset_mean[im]) / self.dataset_std[im]
                     output_i = torch.clip(self.models[im](input_vector.float().to(self.device)), 0, 1)
                     osc_pred_batch[n, :, :, ch_i, ch_j] = np.reshape(output_i.cpu().numpy(), (self.crop, self.crop))
+                osc_pred_batch[n, :, :, :, :] = sinkhorn_normalization(osc_pred_batch[n, :, :, :, :])
         return osc_pred_batch
 
 
